@@ -105,27 +105,24 @@
     "configDef": {
       "configModel": {
         "type": "object",
-        "title": "Template Channel Settings",
+        "title": "NAV 2009 - Frederick Goldman Channel Settings",
         "properties": {
-          "protocol": {
-            "title": "Protocol",
+          "wsdl_uri_Customer": {
+            "title": "WSDL URI - Customer",
             "type": "string"
           },
-          "implFolderName": {
-            "title": "Implementation Folder Name",
+          "wsdl_uri_Order": {
+            "title": "WSDL URI - Order",
             "type": "string"
           }
         },
         "required": [
-          "protocol",
-          "implFolderName"
+          "wsdl_uri_Customer",
+          "wsdl_uri_Order"
         ]
       },
       "configView": [],
-      "configValues": {
-        "protocol": "https",
-        "implFolderName": "nav"
-      }
+      "configValues": {}
     }
   },
   "channelAuthSchema": {
@@ -135,20 +132,41 @@
         "type": "object",
         "title": "Credentials Config",
         "properties": {
-          "account": {
-            "title": "Account Number",
+          "username": {
+            "title": "Username",
+            "type": "string"
+          },
+          "password": {
+            "title": "Password",
+            "type": "string"
+          },
+          "domain": {
+            "title": "Domain",
             "type": "string"
           }
         },
         "required": [
-          "account"
+          "username",
+          "password",
+          "domain"
         ]
       },
       "configView": [
-				{
-					"key": "account",
-					"title": "Account Number"
-				}
+        {
+          "key": "username",
+          "title": "Username",
+          "type": "string"
+        },
+        {
+            "key": "password",
+            "title": "Password",
+            "type": "password"
+        },
+        {
+          "key": "domain",
+          "title": "Domain",
+          "type": "string"
+        }
       ],
       "configValues": {}
     }
