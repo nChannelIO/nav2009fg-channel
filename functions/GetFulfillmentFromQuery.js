@@ -1,167 +1,208 @@
-let GetFulfillmentFromQuery = function (ncUtil,
-                                 channelProfile,
-                                 flowContext,
-                                 payload,
-                                 callback) {
+'use strict';
 
-  log("Building response object...", ncUtil);
-  let out = {
-    ncStatusCode: null,
-    response: {},
-    payload: {}
-  };
+let _ = require('lodash');
 
-  let invalid = false;
-  let invalidMsg = "";
+let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, payload, callback) {
 
-  //If ncUtil does not contain a request object, the request can't be sent
-  if (!ncUtil) {
-    invalid = true;
-    invalidMsg = "ncUtil was not provided"
-  }
+    log("Begin Check For Customer...");
 
-  //If channelProfile does not contain channelSettingsValues, channelAuthValues or fulfillmentBusinessReferences, the request can't be sent
-  if (!channelProfile) {
-    invalid = true;
-    invalidMsg = "channelProfile was not provided"
-  } else if (!channelProfile.channelSettingsValues) {
-    invalid = true;
-    invalidMsg = "channelProfile.channelSettingsValues was not provided"
-  } else if (!channelProfile.channelSettingsValues.protocol) {
-    invalid = true;
-    invalidMsg = "channelProfile.channelSettingsValues.protocol was not provided"
-  } else if (!channelProfile.channelAuthValues) {
-    invalid = true;
-    invalidMsg = "channelProfile.channelAuthValues was not provided"
-  } else if (!channelProfile.fulfillmentBusinessReferences) {
-    invalid = true;
-    invalidMsg = "channelProfile.fulfillmentBusinessReferences was not provided"
-  } else if (!Array.isArray(channelProfile.fulfillmentBusinessReferences)) {
-    invalid = true;
-    invalidMsg = "channelProfile.fulfillmentBusinessReferences is not an array"
-  } else if (channelProfile.fulfillmentBusinessReferences.length === 0) {
-    invalid = true;
-    invalidMsg = "channelProfile.fulfillmentBusinessReferences is empty"
-  }
-
-  //If a sales order document was not passed in, the request is invalid
-  if (!payload) {
-    invalid = true;
-    invalidMsg = "payload was not provided"
-  } else if (!payload.doc) {
-    invalid = true;
-    invalidMsg = "payload.doc was not provided";
-  }
-
-  //If callback is not a function
-  if (!callback) {
-    throw new Error("A callback function was not provided");
-  } else if (typeof callback !== 'function') {
-    throw new TypeError("callback is not a function")
-  }
-
-  if (!invalid) {
-    // Using request for example - A different npm module may be needed depending on the API communication is being made to
-    // The `soap` module can be used in place of `request` but the logic and data being sent will be different
-    let request = require('request');
-
-    let url = "https://localhost/";
-
-    // Add any headers for the request
-    let headers = {
-
+    let out = {
+        ncStatusCode: null,
+        payload: {}
     };
 
-    // Log URL
-    log("Using URL [" + url + "]", ncUtil);
+    let validationMessages = validateArguments();
 
-    // Set options
-    let options = {
-      url: url,
-      method: "GET",
-      headers: headers,
-      body: payload.doc,
-      json: true
-    };
+    if (validationMessages.length === 0) {
 
-    try {
-      // Pass in our URL and headers
-      request(options, function (error, response, body) {
-        if (!error) {
-          // If no errors, process results here
-          log("Do GetFulfillmentFromQuery Callback", ncUtil);
-          out.response.endpointStatusCode = response.statusCode;
-          out.response.endpointStatusMessage = response.statusMessage;
+        try {
 
-          // Parse data
-          let docs = [];
-          let data = body;
+            const soap = require('soap-ntlm-2');
 
-          if (response.statusCode === 200) {
-            if (data.fulfillments && data.fulfillments.length > 0) {
-              for (let i = 0; i < data.fulfillments.length; i++) {
-                let fulfillment = {
-                  fulfillment: data.fulfillments[i]
-                };
-                docs.push({
-                  doc: fulfillment,
-                  fulfillmentRemoteID: fulfillment.fulfillment.id,
-                  fulfillmentBusinessReference: fulfillment.fulfillment.id,
-                  salesOrderRemoteID: payload.salesOrderRemoteID
-                });
-              }
-              if (docs.length === payload.doc.pageSize) {
-                out.ncStatusCode = 206;
-              } else {
-                out.ncStatusCode = 200;
-              }
-              out.payload = docs;
-            } else {
-              out.ncStatusCode = 204;
-              out.payload = data;
-            }
-          } else if (response.statusCode === 429) {
-            out.ncStatusCode = 429;
-            out.payload.error = data;
-          } else if (response.statusCode === 500) {
+            let url = channelProfile.channelSettingsValues.baseUrl + "/Codeunit/ECommerce_Order?wsdl";
+
+            let options = {
+                wsdl_options: {
+                    ntlm: true,
+                    username: channelProfile.channelAuthValues.username,
+                    password: channelProfile.channelAuthValues.password,
+                    workstation: channelProfile.channelAuthValues.workstation,
+                    domain: channelProfile.channelAuthValues.domain,
+                    strictSSL: false,
+                    rejectUnauthorized: false
+                }
+            };
+
+            let args = {
+                order_No: "E*",
+                shipped_Start_DateTime: payload.doc.modifiedDateRange.startDateGMT,
+                shipped_End_DateTime: payload.doc.modifiedDateRange.endDateGMT,
+                ec_Transactions: "",
+                export_Status: ""
+            };
+
+            soap.createClient(url, options, function (err, client) {
+                if (err) {
+                    logError(err);
+                    out.ncStatusCode = 500;
+                    out.payload.error = {err: err};
+                    callback(out);
+                } else {
+                    client.setSecurity(new soap.NtlmSecurity(options.wsdl_options));
+                    client.Export_Order_Transactions(args, function (err, result) {
+                        if (err) {
+                            logError(err);
+                            out.ncStatusCode = 500;
+                            out.payload.error = {err: err};
+                            callback(out);
+                        } else {
+                            console.log("about to check results");
+                            if (result.export_Status === "SUCCESS") {
+                                console.log("result = SUCCESS");
+                                // good api call - but might not have any fulfillments that meet search criteria
+                                if (result.ec_Transactions.OrderTranscation.length === 0) {
+                                    // error - should always have at least one blank node or 1 or more good nodes
+                                    out.ncStatusCode = 400;
+                                    out.payload.error = "unexpected xml returned";
+                                } else if (result.ec_Transactions.OrderTranscation.length === 1 && !result.ec_Transactions.OrderTranscation.Customer_No) {
+                                    // at least one node returned - see if it is empty node
+                                    out.ncStatusCode = 204;
+                                    out.payload = [];
+                                } else {
+                                    // valid data returned - one or more nodes of fulfillments
+                                    out.ncStatusCode = 200;
+                                    out.payload = [];
+                                    result.ec_Transactions.OrderTranscation.forEach(fulfillment => {
+                                        out.payload.push({
+                                            doc: fulfillment,
+                                            salesOrderRemoteID: fulfillment.Order_No,
+                                            salesOrderBusinessReference: extractBusinessReference(channelProfile.salesOrderBusinessReferences, fulfillment),
+                                            fulfillmentRemoteID: fulfillment.Order_No,
+                                            fulfillmentBusinessReference: extractBusinessReference(channelProfile.fulfillmentBusinessReferences, fulfillment),
+                                        });
+                                    });
+                                }
+                            } else {
+                                // validation error situation - process error message field
+                                console.log("validation error");
+                                out.ncStatusCode = 400;
+                                out.payload.error = result.return_value;
+                            }
+                            callback(out);
+                        }
+                    });
+                }
+            });
+
+        } catch (error) {
+            logError("Exception occurred in GetFullfillmentFromQuery: " + error);
             out.ncStatusCode = 500;
-            out.payload.error = data;
-          } else {
-            out.ncStatusCode = 400;
-            out.payload.error = data;
-          }
-
-          callback(out);
-        } else {
-          // If an error occurs, log the error here
-          logError("Do GetFulfillmentFromQuery Callback error - " + error, ncUtil);
-          out.ncStatusCode = 500;
-          out.payload.error = {err: error};
-          callback(out);
+            out.payload.error = {err: error, stack: error.stackTrace};
+            callback(out);
         }
-      });
-    } catch (err) {
-      // Exception Handling
-      logError("Exception occurred in GetFulfillmentFromQuery - " + err, ncUtil);
-      out.ncStatusCode = 500;
-      out.payload.error = {err: err, stack: err.stackTrace};
-      callback(out);
+
+    } else {
+        out.ncStatusCode = 400;
+        out.payload.error = {
+            err: "Invalid request: " + validationMessages.join(",")
+        };
+        callback(out);
     }
-  } else {
-    // Invalid Request
-    log("Callback with an invalid request - " + invalidMsg, ncUtil);
-    out.ncStatusCode = 400;
-    out.payload.error = invalidMsg;
-    callback(out);
-  }
+
+    function validateArguments() {
+
+        let validationMessages = [];
+
+        try {
+            // Validate ncUtil object (not currently used)
+
+            // Validate channelProfile object
+            if (typeof channelProfile === "object" && channelProfile !== null) {
+                // Validate channelProfile properties
+
+
+                // Validate channelSettingsValues object
+                if (typeof channelProfile.channelSettingsValues === "object" && channelProfile.channelSettingsValues !== null) {
+
+                    if (typeof channelProfile.channelSettingsValues.baseUrl !== "string" || channelProfile.channelSettingsValues.baseUrl.trim().length === 0) {
+                        validationMessages.push("The channelProfile.channelSettingsValues.baseUrl string is either missing or invalid.");
+                    } else if (channelProfile.channelSettingsValues.baseUrl.substr(-1) !== "/") {
+                        channelProfile.channelSettingsValues.baseUrl += "/";
+                    }
+
+                } else {
+                    validationMessages.push("The channelProfile.channelSettingsValues object is either missing or invalid.");
+                }
+
+                // Validate channelAuthValues object
+                if (typeof channelProfile.channelAuthValues === "object" && channelProfile.channelAuthValues !== null) {
+
+                    if (typeof channelProfile.channelAuthValues.username !== "string" || channelProfile.channelAuthValues.username.trim().length === 0) {
+                        validationMessages.push("The channelProfile.channelAuthValues.username string is either missing or invalid.");
+                    }
+
+                    if (typeof channelProfile.channelAuthValues.password !== "string" || channelProfile.channelAuthValues.password.trim().length === 0) {
+                        validationMessages.push("The channelProfile.channelAuthValues.password string is either missing or invalid.");
+                    }
+
+                } else {
+                    validationMessages.push("The channelProfile.channelAuthValues object is either missing or invalid.");
+                }
+
+            } else {
+                validationMessages.push("The channelProfile object is either missing or invalid.");
+            }
+
+            // Validate flowContext object (not currently used)
+
+            // Validate payload object
+            if (typeof payload === "object" && payload !== null) {
+
+                if (!payload.doc) {
+                    validationMessages.push("The payload.doc is either missing or invalid.");
+                }
+
+            } else {
+                validationMessages.push("The payload object is either missing or invalid.");
+            }
+
+            // Validate callback function
+            if (typeof callback !== "function") {
+                validationMessages.push("The callback function is either missing or invalid.");
+                throw new TypeError(validationMessages[validationMessages.length - 1]);
+            }
+        } finally {
+            // Log the validation messages
+            validationMessages.forEach(logError);
+        }
+
+        return validationMessages;
+    };
+
+    function logError(msg) {
+        console.log("[error] " + msg);
+    };
+
+    function log(msg) {
+        console.log("[info] " + msg);
+    };
 };
 
-function logError(msg, ncUtil) {
-  console.log("[error] " + msg);
-}
+function extractBusinessReference(businessReferences, doc) {
+  if (!businessReferences || !Array.isArray(businessReferences)) {
+    throw new Error('Error: businessReferences must be an Array');
+  } else if (!doc || typeof doc !== 'object') {
+    throw new Error('Error: doc must be an object');
+  }
 
-function log(msg, ncUtil) {
-  console.log("[info] " + msg);
+  let values = [];
+
+  // Get the businessReference
+  businessReferences.forEach(function (businessReference) {
+    values.push(_.get(doc, businessReference));
+  });
+
+  return values.join(".");
 }
 
 module.exports.GetFulfillmentFromQuery = GetFulfillmentFromQuery;
