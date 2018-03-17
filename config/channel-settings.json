@@ -17,19 +17,25 @@
       "name" : "PUT SALESORDER",
       "configDef" : {
         "configValues" : {
-          "canUpdateOrderFlag" : false
+          "canUpdateOrderFlag" : false,
+          "doPutCustomerFlag": true
         },
         "configView" : [
           "canUpdateOrderFlag"
         ],
         "configModel" : {
           "required" : [
-            "canUpdateOrderFlag"
+            "canUpdateOrderFlag",
+            "doPutCustomerFlag"
           ],
           "properties" : {
             "canUpdateOrderFlag" : {
               "type" : "boolean",
               "title" : "PUT Order, canUpdateOrderFlag"
+            },
+            "doPutCustomerFlag": {
+              "type": "boolean",
+              "title": "PUT Order, doPutCustomerFlag"
             }
           },
           "type" : "object"
@@ -60,17 +66,25 @@
             "canUpdateCustomerFlag" : {
               "title" : "PUT Customer, canUpdateCustomerFlag",
               "type" : "boolean"
+            },
+            "doPutCustomerAddressesFlag": {
+              "title": "PUT Customer, doPutCustomerAddressesFlag",
+              "type": "boolean"
+            },
+            "doPutCustomerContactsFlag": {
+              "title": "PUT Customer, doPutCustomerContactsFlag",
+              "type": "boolean"
             }
           },
           "required" : [
             "canUpdateCustomerFlag"
           ]
         },
-        "configView" : [
-          "canUpdateCustomerFlag"
-        ],
+        "configView" : [],
         "configValues" : {
-          "canUpdateCustomerFlag": true
+          "canUpdateCustomerFlag": true,
+          "doPutCustomerAddressesFlag": false,
+          "doPutCustomerContactsFlag": false
         }
       },
       "documentDef": {
