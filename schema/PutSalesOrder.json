@@ -65,8 +65,7 @@
 	],
 	"definitions": {
 		"SalesOrderObject": {
-			"type": "object",
-
+			"type": "object"
 		},
 		"SalesLineObject": {
 			"type": "object",
