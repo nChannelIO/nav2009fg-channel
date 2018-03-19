@@ -138,11 +138,13 @@
         "properties": {
           "wsdl_uri_Customer": {
             "title": "WSDL URI - Customer",
-            "type": "string"
+            "type": "string",
+            "placeholder":"<URI of WSDL>?wsdl"
           },
           "wsdl_uri_Order": {
             "title": "WSDL URI - Order",
-            "type": "string"
+            "type": "string",
+            "placeholder":"<URI of WSDL>?wsdl"
           }
         },
         "required": [
