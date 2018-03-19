@@ -1,6 +1,7 @@
 'use strict';
 
 let _ = require('lodash');
+let dateFormat = require('dateformat');
 
 let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, payload, callback) {
 
@@ -33,10 +34,12 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
                 }
             };
 
+            let format = 'UTC:m/dd/yyyy h:MM:ss TT';
+
             let args = {
                 order_No: "E*",
-                shipped_Start_DateTime: payload.doc.modifiedDateRange.startDateGMT,
-                shipped_End_DateTime: payload.doc.modifiedDateRange.endDateGMT,
+                shipped_Start_DateTime: dateFormat(payload.doc.modifiedDateRange.startDateGMT, format),
+                shipped_End_DateTime: dateFormat(payload.doc.modifiedDateRange.endDateGMT, format),
                 ec_Transactions: "",
                 export_Status: ""
             };
