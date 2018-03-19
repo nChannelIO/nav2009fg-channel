@@ -1,73 +1,81 @@
 {
-	"$schema": "http://json-schema.org/draft-04/schema#",
-	"title": "NAV 2009 Frederick Goldman - PUT Customer Schema",
-	"type": "object",
-	"properties": {
-		"attributes": {
-			"type": "object"
+	"name": "NAV 2009 Frederick Goldman - PUT Customer Schema",
+	"schemaDef": {
+		"$schema": "http://json-schema.org/draft-04/schema#",
+		"title": "NAV 2009 Frederick Goldman - PUT Customer Schema",
+		"type": "object",
+		"properties": {
+			"attributes": {
+				"type": "object"
+			},
+			"CustomerNo": {
+				"type": "string"
+			},
+			"E_Mail": {
+				"title": "E_Mail",
+				"description": "The customer's email address.",
+				"type": [
+					"string"
+				]
+			},
+			"Name": {
+				"title": "Name",
+				"description": "The customer's name.",
+				"type": "string"
+			},
+			"Phone_No": {
+				"title": "Phone_No",
+				"description": "The customer's phone number.",
+				"type": [
+					"string"
+				]
+			},
+			"Address": {
+				"title": "Address",
+				"description": "The customer's mailing address # 1.",
+				"type": "string"
+			},
+			"Address_2": {
+				"title": "Address_2",
+				"description": "An additional field for the customer's mailing address.",
+				"type": [
+					"string",
+					"null"
+				]
+			},
+			"City": {
+				"title": "City",
+				"description": " The customer's city.",
+				"type": "string"
+			},
+			"County": {
+				"title": "County",
+				"description": "The customer's province or state name.",
+				"type": [
+					"string"
+				]
+			},
+			"Postal_Code": {
+				"title": "Postal_Code",
+				"description": "The customer's zip or postal code.",
+				"type": "string"
+			}
 		},
-		"CustomerNo": {
-			"type": "string"
-		},
-		"E_Mail": {
-			"title": "E_Mail",
-			"description": "The customer's email address.",
-			"type": [
-				"string"
-			]
-		},
-		"Name": {
-			"title": "Name",
-			"description": "The customer's name.",
-			"type": "string"
-		},
-		"Phone_No": {
-			"title": "Phone_No",
-			"description": "The customer's phone number.",
-			"type": [
-				"string"
-			]
-		},
-		"Address": {
-			"title": "Address",
-			"description": "The customer's mailing address # 1.",
-			"type": "string"
-		},
-		"Address_2": {
-			"title": "Address_2",
-			"description": "An additional field for the customer's mailing address.",
-			"type": [
-				"string",
-				"null"
-			]
-		},
-		"City": {
-			"title": "City",
-			"description": " The customer's city.",
-			"type": "string"
-		},
-		"County": {
-			"title": "County",
-			"description": "The customer's province or state name.",
-			"type": [
-				"string"
-			]
-		},
-		"Postal_Code": {
-			"title": "Postal_Code",
-			"description": "The customer's zip or postal code.",
-			"type": "string"
-		}
+		"required": [
+			"E_Mail",
+			"Name",
+			"Phone_No",
+			"Address",
+			"Address_2",
+			"City",
+			"County",
+			"Postal_Code"
+		],
+		"additionalProperties": false
 	},
-	"required": [
-		"E_Mail",
-		"Name",
-		"Phone_No",
-		"Address",
-		"Address_2",
-		"City",
-		"County",
-		"Postal_Code"
+	"tags": [
+		"Put",
+		"Customer"
 	],
-	"additionalProperties": false
+	"audit": {}
 }
