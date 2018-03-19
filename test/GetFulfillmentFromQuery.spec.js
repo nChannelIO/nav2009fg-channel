@@ -4,21 +4,15 @@ let expect = require('chai').expect;
 let _ = require('lodash');
 let fulfillment = require('../functions/GetFulfillmentFromQuery.js');
 let channelProfile = {
-  channelSettingsSchema: {
-    protocol: 'https',
-		wsdl_uri_Order: 'http://fgiecommerce.fgoldman.com:7047/DynamicsNAV/WS/TEST-FGI/Codeunit/ECommerce_Order?wsdl'
-  },
-  channelAuthValues: {
-    account: 'test',
-		username: "fgiecommercews",
-		password: "Jewel!2018",
-		domain: "fgoldman"
-  },
+  channelAuthValues: require('./channelAuthValues.json'),
   channelSettingsValues: {
-	  baseUrl: "http://fgiecommerce.fgoldman.com:7047/DynamicsNAV/WS/TEST-FGI"
+    wsdl_uri_Order: "http://fgiecommerce.fgoldman.com:7047/DynamicsNAV/WS/TEST-FGI/Codeunit/ECommerce_Order?wsdl"
   },
   salesOrderBusinessReferences: ['Order_No'],
   fulfillmentBusinessReferences: ['Order_No']
+};
+let flowContext = {
+  orderNumberFilter: 'E'
 };
 
 let ncUtil = {
@@ -37,7 +31,7 @@ describe('GetFulfillmentFromQuery', () => {
           }
         }
       };
-      fulfillment.GetFulfillmentFromQuery(ncUtil, channelProfile, null, examplePayload, (response) => {
+      fulfillment.GetFulfillmentFromQuery(ncUtil, channelProfile, flowContext, examplePayload, (response) => {
         expect(response.ncStatusCode).to.be.equal(204);
         expect(response.payload).to.be.an('Array');
         expect(response.payload).to.have.length(0);
@@ -70,7 +64,7 @@ describe('GetFulfillmentFromQuery', () => {
         Status: "Released"
       };
 
-      fulfillment.GetFulfillmentFromQuery(ncUtil, channelProfile, null, examplePayload, (response) => {
+      fulfillment.GetFulfillmentFromQuery(ncUtil, channelProfile, flowContext, examplePayload, (response) => {
         expect(response.ncStatusCode).to.be.equal(200);
         expect(response.payload).to.be.an('Array');
         expect(response.payload).to.have.length(1);
@@ -128,7 +122,8 @@ describe('GetFulfillmentFromQuery', () => {
         },
       ];
 
-      fulfillment.GetFulfillmentFromQuery(ncUtil, channelProfile, null, examplePayload, (response) => {
+      fulfillment.GetFulfillmentFromQuery(ncUtil, channelProfile, flowContext, examplePayload, (response) => {
+        console.log(response);
 				expect(response.ncStatusCode).to.be.equal(200);
 				expect(response.payload).to.be.an('Array');
 				expect(response.payload).to.have.length(2);
@@ -146,7 +141,7 @@ describe('GetFulfillmentFromQuery', () => {
 			});
 		});
 
-    it('should return 400 because the channel profile does not contain the baseUrl', (done) => {
+    it('should return 400 because the channel profile does not contain the wsdl_uri_Order', (done) => {
       let examplePayload = {
         doc: {
           modifiedDateRange: {
@@ -157,10 +152,6 @@ describe('GetFulfillmentFromQuery', () => {
       };
 
       let channelProfile = {
-        channelSettingsSchema: {
-          protocol: 'https',
-          wsdl_uri_Order: 'http://fgiecommerce.fgoldman.com:7047/DynamicsNAV/WS/TEST-FGI/Codeunit/ECommerce_Order?wsdl'
-        },
         channelAuthValues: {
           account: 'test',
           username: "fgiecommercews",
@@ -168,13 +159,13 @@ describe('GetFulfillmentFromQuery', () => {
           domain: "fgoldman"
         },
         channelSettingsValues: {
-          baseUrl: ""
+          wsdl_uri_Order: ""
         },
         salesOrderBusinessReferences: ['Order_No'],
         fulfillmentBusinessReferences: ['Order_No']
       };
 
-      fulfillment.GetFulfillmentFromQuery(ncUtil, channelProfile, null, examplePayload, (response) => {
+      fulfillment.GetFulfillmentFromQuery(ncUtil, channelProfile, flowContext, examplePayload, (response) => {
         expect(response.ncStatusCode).to.be.equal(400);
         expect(response.payload).to.be.an('Object');
         expect(response.payload).to.have.property('error');
@@ -191,7 +182,7 @@ describe('GetFulfillmentFromQuery', () => {
 					}
 				}
 			};
-			fulfillment.GetFulfillmentFromQuery(ncUtil, channelProfile, null, examplePayload, (response) => {
+			fulfillment.GetFulfillmentFromQuery(ncUtil, channelProfile, flowContext, examplePayload, (response) => {
 				expect(response.ncStatusCode).to.be.equal(500);
 				expect(response.payload).to.be.an('Object');
 				expect(response.payload).to.have.property('error');
