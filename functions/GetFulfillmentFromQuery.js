@@ -3,10 +3,11 @@
 let _ = require('lodash');
 let dateFormat = require('dateformat');
 let format = 'UTC:m/dd/yyyy h:MM:ss TT';
+let soap = require('soap-ntlm-2');
 
 let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, payload, callback) {
 
-    log("Begin Check For Fulfillment...");
+    log("Begin GetFulfillmentFromQuery...");
 
     let out = {
         ncStatusCode: null,
@@ -19,9 +20,7 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
 
         try {
 
-            const soap = require('soap-ntlm-2');
-
-            let url = channelProfile.channelSettingsValues.baseUrl + "/Codeunit/ECommerce_Order?wsdl";
+            let url = channelProfile.channelSettingsValues.wsdl_uri_Order;
 
             let options = {
                 wsdl_options: {
@@ -36,16 +35,18 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
             };
 
             let args = {
-                order_No: "E*",
+                order_No: flowContext.orderNumberFilter + "*",
                 shipped_Start_DateTime: dateFormat(payload.doc.modifiedDateRange.startDateGMT, format),
                 shipped_End_DateTime: dateFormat(payload.doc.modifiedDateRange.endDateGMT, format),
                 ec_Transactions: "",
                 export_Status: ""
             };
 
+            log(`Using URL: [${url}]`);
+
             soap.createClient(url, options, function (err, client) {
                 if (err) {
-                    logError(err);
+                    logError("Error creating client - " + err);
                     out.ncStatusCode = 500;
                     out.payload.error = {err: err};
                     callback(out);
@@ -53,7 +54,7 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
                     client.setSecurity(new soap.NtlmSecurity(options.wsdl_options));
                     client.Export_Order_Transactions(args, function (err, result) {
                         if (err) {
-                            logError(err);
+                            logError("Error making request - " + err);
                             out.ncStatusCode = 500;
                             out.payload.error = {err: err};
                             callback(out);
@@ -84,7 +85,7 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
                                 }
                             } else {
                                 // validation error situation - process error message field
-                                console.log("validation error");
+                                logError("Response error - " + result.return_value);
                                 out.ncStatusCode = 400;
                                 out.payload.error = result.return_value;
                             }
@@ -102,6 +103,7 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
         }
 
     } else {
+        logError("Validation failed - " + validationMessages.join(","));
         out.ncStatusCode = 400;
         out.payload.error = {
             err: "Invalid request: " + validationMessages.join(",")
@@ -124,10 +126,8 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
                 // Validate channelSettingsValues object
                 if (typeof channelProfile.channelSettingsValues === "object" && channelProfile.channelSettingsValues !== null) {
 
-                    if (typeof channelProfile.channelSettingsValues.baseUrl !== "string" || channelProfile.channelSettingsValues.baseUrl.trim().length === 0) {
-                        validationMessages.push("The channelProfile.channelSettingsValues.baseUrl string is either missing or invalid.");
-                    } else if (channelProfile.channelSettingsValues.baseUrl.substr(-1) !== "/") {
-                        channelProfile.channelSettingsValues.baseUrl += "/";
+                    if (typeof channelProfile.channelSettingsValues.wsdl_uri_Order !== "string" || channelProfile.channelSettingsValues.wsdl_uri_Order.trim().length === 0) {
+                        validationMessages.push("The channelProfile.channelSettingsValues.wsdl_uri_Order string is either missing or invalid.");
                     }
 
                 } else {
