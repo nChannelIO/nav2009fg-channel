@@ -3,6 +3,7 @@
   "author": "",
   "description": "",
   "dependencies": {
+    "dateformat": "^3.0.3",
     "request": "2.83.0",
     "soap-ntlm-2": "^0.9.4"
   },

@@ -32,8 +32,8 @@ describe('GetFulfillmentFromQuery', () => {
       let examplePayload = {
         doc: {
           modifiedDateRange: {
-            startDateGMT: "3/01/2018 2:40:00 PM",
-            endDateGMT: "3/01/2018 2:41:00 PM"
+            startDateGMT: "2018-03-01T14:40:00.000Z",
+            endDateGMT: "2018-03-01T14:41:00.000Z",
           }
         }
       };
@@ -49,8 +49,8 @@ describe('GetFulfillmentFromQuery', () => {
       let examplePayload = {
         doc: {
           modifiedDateRange: {
-            startDateGMT: "03/12/18 01:54:00 AM",
-            endDateGMT: "03/12/18 12:56:00 PM",
+            startDateGMT: "2018-03-12T13:54:00.000Z",
+            endDateGMT: "2018-03-12T13:56:00.000Z",
           }
         }
       };
@@ -92,8 +92,8 @@ describe('GetFulfillmentFromQuery', () => {
 			let examplePayload = {			
 				doc: {
 					modifiedDateRange: {
-						startDateGMT: "3/01/2018 2:41:00 PM",
-						endDateGMT: "3/16/2018 2:41:00 PM"
+						startDateGMT: "2018-03-01T14:41:00.000Z",
+            endDateGMT: "2018-03-16T14:41:00.000Z",
 					}
 				}
 			};
@@ -148,15 +148,34 @@ describe('GetFulfillmentFromQuery', () => {
 			});
 		});
 
-    it.skip('should query by date range but...? cause 400 - request success and error message', (done) => {
+    it('should return 400 because the channel profile does not contain the baseUrl', (done) => {
       let examplePayload = {
         doc: {
           modifiedDateRange: {
-            startDateGMT: "3/01/2018 2:40:00 PM", //TODO determine query which will cause a 400
-            endDateGMT: "3/01/2018 2:41:00 PM"
+            startDateGMT: "2018-03-01T14:41:00.000Z",
+            endDateGMT: "2018-03-16T14:41:00.000Z",
           }
         }
       };
+
+      let channelProfile = {
+        channelSettingsSchema: {
+          protocol: 'https',
+          wsdl_uri_Order: 'http://fgiecommerce.fgoldman.com:7047/DynamicsNAV/WS/TEST-FGI/Codeunit/ECommerce_Order?wsdl'
+        },
+        channelAuthValues: {
+          account: 'test',
+          username: "fgiecommercews",
+          password: "Jewel!2018",
+          domain: "fgoldman"
+        },
+        channelSettingsValues: {
+          baseUrl: ""
+        },
+        salesOrderBusinessReferences: ['Order_No'],
+        fulfillmentBusinessReferences: ['Order_No']
+      };
+
       fulfillment.GetFulfillmentFromQuery(ncUtil, channelProfile, null, examplePayload, (response) => {
         expect(response.ncStatusCode).to.be.equal(400);
         expect(response.payload).to.be.an('Object');
@@ -165,12 +184,12 @@ describe('GetFulfillmentFromQuery', () => {
       });
     });
 
-    it('should query by date range but dates are wrong format - request failure and error message', (done) => {
+    it.skip('should query by date range but fail with a 500 because...? - request success and error message', (done) => {
 			let examplePayload = {			
 				doc: {
 					modifiedDateRange: {
-						startDateGMT: "2018-11-23T09:44:07-06:00",
-						endDateGMT: "2013-03-14T11:15:04-06:00"
+						startDateGMT: "2018-03-01T14:41:00.000Z",
+            endDateGMT: "2018-03-16T14:41:00.000Z",
 					}
 				}
 			};
