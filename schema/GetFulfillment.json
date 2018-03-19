@@ -65,7 +65,7 @@
 			"title": "Status",
 			"description": "Status",
 			"type": "string"
-		},
+		}
 	},
 	"required": [
 		"Order_No",
