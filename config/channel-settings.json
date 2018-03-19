@@ -101,10 +101,25 @@
         "ruleSchema": {},
         "defaultRuleValues": {}
       },
-      "configDef": {
-        "configModel": {},
-        "configView": [],
-        "configValues": {}
+      "configDef" : {
+        "configModel" : {
+          "type" : "object",
+          "properties" : {
+            "orderNumberFilter" : {
+              "title" : "Order Number Filter",
+              "type" : "string"
+            }
+          },
+          "required" : [
+            "orderNumberFilter"
+          ]
+        },
+        "configView" : [
+          "orderNumberFilter"
+        ],
+        "configValues" : {
+          "orderNumberFilter": "ET*"
+        }
       },
       "documentDef": {
         "schema": {},
