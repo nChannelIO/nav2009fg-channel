@@ -135,7 +135,10 @@
           "wsdl_uri_Order"
         ]
       },
-      "configView": [],
+      "configView": [
+        "wsdl_uri_Customer",
+        "wsdl_uri_Order"
+      ],
       "configValues": {}
     }
   },
