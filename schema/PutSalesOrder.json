@@ -42,20 +42,12 @@
 				"Pending_Prepayment"
 			]
 		},
-		"SalesLines": {
-			"type": "object",
-			"properties": {
-				"SalesLine": {
-					"type": "array",
-					"minItems": 1,
-					"items": {
-						"$ref": "#/definitions/SalesLineObject"
-					}
-				}
-			},
-			"required": [
-				"SalesLine"
-			]
+		"SalesLine": {
+			"type": "array",
+			"minItems": 1,
+			"items": {
+				"$ref": "#/definitions/SalesLineObject"
+			}
 		}
 	},
 	"required": [
@@ -69,8 +61,7 @@
 		"Ship_to_Post_County",
 		"Ship_to_Post_Code",
 		"Shipment_Method_Code",
-		"orderStatus",
-		"SalesLines"
+		"SalesLine"
 	],
 	"definitions": {
 		"SalesOrderObject": {
