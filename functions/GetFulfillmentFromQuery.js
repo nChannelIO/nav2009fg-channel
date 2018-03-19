@@ -2,10 +2,11 @@
 
 let _ = require('lodash');
 let dateFormat = require('dateformat');
+let format = 'UTC:m/dd/yyyy h:MM:ss TT';
 
 let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, payload, callback) {
 
-    log("Begin Check For Customer...");
+    log("Begin Check For Fulfillment...");
 
     let out = {
         ncStatusCode: null,
@@ -34,8 +35,6 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
                 }
             };
 
-            let format = 'UTC:m/dd/yyyy h:MM:ss TT';
-
             let args = {
                 order_No: "E*",
                 shipped_Start_DateTime: dateFormat(payload.doc.modifiedDateRange.startDateGMT, format),
@@ -59,9 +58,7 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
                             out.payload.error = {err: err};
                             callback(out);
                         } else {
-                            console.log("about to check results");
                             if (result.export_Status === "SUCCESS") {
-                                console.log("result = SUCCESS");
                                 // good api call - but might not have any fulfillments that meet search criteria
                                 if (result.ec_Transactions.OrderTranscation.length === 0) {
                                     // error - should always have at least one blank node or 1 or more good nodes
@@ -98,7 +95,7 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
             });
 
         } catch (error) {
-            logError("Exception occurred in GetFullfillmentFromQuery: " + error);
+            logError("Exception occurred in GetFulfillmentFromQuery: " + error);
             out.ncStatusCode = 500;
             out.payload.error = {err: error, stack: error.stackTrace};
             callback(out);
@@ -180,15 +177,15 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
         }
 
         return validationMessages;
-    };
+    }
 
     function logError(msg) {
-        console.log("[error] " + msg);
-    };
+        console.error("[error] " + msg);
+    }
 
     function log(msg) {
         console.log("[info] " + msg);
-    };
+    }
 };
 
 function extractBusinessReference(businessReferences, doc) {
