@@ -3,94 +3,75 @@
 	"title": "NAV 2009 Frederick Goldman - GET Fulfillment Schema",
 	"type": "object",
 	"properties": {
-		"ec_Transactions": {
-			"type": "object",
-			"properties": {
-				"OrderTransaction": {
-					"$ref": "#/definitions/OrderTransactionObject"
-				}
-			}
-		}
+		"attributes": {
+			"type": "object"
+		},
+		"Customer_No": {
+			"title": "Customer_No",
+			"description": "Customer Number",
+			"type": "string"
+		},
+		"Order_No": {
+			"title": "Order_No",
+			"description": "Order Number",
+			"type": "string"
+		},
+		"Line_No": {
+			"title": "Line_No",
+			"description": "Line Number",
+			"type": "number"
+		},
+		"ItemNo_Size": {
+			"title": "ItemNo_Size",
+			"description": "Item Number Size",
+			"type": "string"
+		},
+		"Website_Code": {
+			"title": "Website_Code",
+			"description": "Website Code",
+			"type": "string"
+		},
+		"Ordered_Quantity": {
+			"title": "Ordered_Quantity",
+			"description": "Ordered Quantity",
+			"type": "string"
+		},
+		"Shipped_Quantity": {
+			"title": "Shipped_Quantity",
+			"description": "Shipped Quantity",
+			"type": "string"
+		},
+		"Shipping_Agent_Code": {
+			"title": "Shipping_Agent_Code",
+			"description": "Shipping Agent Code",
+			"type": "string"
+		},
+		"Tracking_No": {
+			"title": "Tracking_No",
+			"description": "Tracking Number",
+			"type": "string"
+		},
+		"Shipment_No": {
+			"title": "Shipment_No",
+			"description": "Shipment Number",
+			"type": "string"
+		},
+		"Shipped_DateTime": {
+			"title": "Shipped_DateTime",
+			"description": "Shipped DateTime",
+			"type": "string"
+		},
+		"Status": {
+			"title": "Status",
+			"description": "Status",
+			"type": "string"
+		},
 	},
 	"required": [
-		"OrderTransaction"
+		"Order_No",
+		"Shipping_Agent_Code",
+		"Tracking_No",
+		"Status"
 	],
-	"definitions": {
-		"OrderTransactionObject": {
-			"title": "Order Transaction",
-			"type": "object",
-			"properties": {
-				"attributes": {
-					"type": "object"
-				},
-				"Customer_No": {
-							"title": "Customer_No",
-							"description": "Customer Number",
-							"type": "string"
-						},
-				"Order_No": {
-							"title": "Order_No",
-							"description": "Order Number",
-							"type": "string"
-						},
-				"Line_No": {
-							"title": "Line_No",
-							"description": "Line Number",
-							"type": "string"
-						},
-				"ItemNo_Size": {
-							"title": "ItemNo_Size",
-							"description": "Item Number Size",
-							"type": "string"
-						},
-				"Website_Code": {
-							"title": "Website_Code",
-							"description": "Website Code",
-							"type": "string"
-						},
-				"Ordered_Quantity": {
-							"title": "Ordered_Quantity",
-							"description": "Ordered Quantity",
-							"type": "string"
-						},
-				"Shipped_Quantity": {
-							"title": "Shipped_Quantity",
-							"description": "Shipped Quantity",
-							"type": "string"
-						},
-				"Shipping_Agent_Code": {
-							"title": "Shipping_Agent_Code",
-							"description": "Shipping Agent Code",
-							"type": "string"
-						},
-				"Tracking_No": {
-							"title": "Tracking_No",
-							"description": "Tracking Number",
-							"type": "string"
-						},
-				"Shipment_No": {
-							"title": "Shipment_No",
-							"description": "Shipment Number",
-							"type": "string"
-						},
-				"Shipped_DateTime": {
-							"title": "Shipped_DateTime",
-							"description": "Shipped DateTime",
-							"type": "string"
-						},
-				"Status": {
-							"title": "Status",
-							"description": "Status",
-							"type": "string"
-						},
-			},
-			"required": [
-				"Order_No",
-				"Shipping_Agent_Code",
-				"Tracking_No",
-				"Status"
-			],
-			"additionalProperties": false
-		}
-	}
+	"additionalProperties": false
 }
