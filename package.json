@@ -3,14 +3,16 @@
   "author": "",
   "description": "",
   "dependencies": {
-    "request": "2.83.0"
+    "dateformat": "^3.0.3",
+    "lodash": "^4.17.4",
+    "request": "2.83.0",
+    "soap-ntlm-2": "^0.9.4"
   },
   "devDependencies": {
     "nock": "9.2.3",
     "soap": "0.23.0",
     "sinon": "4.4.4",
     "proxyquire": "2.0.0",
-    "lodash": "^4.17.4",
     "chai": "^3.5.0",
     "mocha": "^3.1.2"
   },
