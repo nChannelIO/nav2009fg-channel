@@ -133,12 +133,10 @@ describe('GetFulfillmentFromQuery', () => {
 				expect(response.payload).to.be.an('Array');
 				expect(response.payload).to.have.length(2);
 				let docs = [];
-				let remoteIDs = []
         response.payload.forEach(fulfillment => {
           expect(fulfillment).to.have.property('doc');
           docs.push(fulfillment.doc);
           expect(fulfillment).to.have.property('salesOrderRemoteID');
-          remoteIDs.push(fulfillment.doc);
           expect(fulfillment).to.have.property('salesOrderBusinessReference');
           expect(fulfillment).to.have.property('fulfillmentRemoteID');
           expect(fulfillment).to.have.property('fulfillmentBusinessReference');
