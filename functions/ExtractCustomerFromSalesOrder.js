@@ -1,112 +1,109 @@
-let ExtractCustomerFromSalesOrder = function(
-    ncUtil,
-    channelProfile,
-    flowContext,
-    payload,
-    callback)
-{
+'use strict';
 
-    log("Building callback object...", ncUtil);
+let ExtractCustomerFromSalesOrder = function (ncUtil, channelProfile, flowContext, payload, callback) {
+
+    let functionName = "ExtractCustomerFromSalesOrder";
+    log("Begin Extract Customer From Sales Order...");
+    
     let out = {
         ncStatusCode: null,
         payload: {}
     };
 
-    // Check callback
-    if (!callback) {
-        throw new Error("A callback function was not provided");
-    } else if (typeof callback !== 'function') {
-        throw new TypeError("callback is not a function")
-    }
+    log("Validate arguments...");
+    let validationMessages = validateArguments();
 
-    try {
-        let notFound = false;
-        let invalid = false;
-        let invalidMsg = "";
-        let data = {};
+    if (validationMessages.length === 0) {
 
-        // Check ncUtil
-        if (!ncUtil) {
-            invalid = true;
-            invalidMsg = "ExtractCustomerFromSalesOrder - Invalid Request: ncUtil was not passed into the function";
+        try {
+
+            if (payload.doc.Sell_to_Email) {
+
+                out.payload.doc = {
+                    CustomerNo: payload.doc.Sell_to_No,
+                    E_Mail: payload.doc.Sell_to_Email,
+                    Name: payload.doc.Sell_to_Customer_Name,
+                    Phone_No: "",
+                    Address: payload.doc.Ship_to_Address,
+                    Address_2: "",
+                    City: payload.doc.Ship_to_City,
+                    County: payload.doc.Ship_to_Post_County,
+                    Postal_Code: payload.doc.Ship_to_Post_Code
+                };
+
+                log("Extracted customer with email '" + out.payload.doc.Sell_to_Email + "' from the sales order document.");
+                log(JSON.stringify(out.payload));
+                out.ncStatusCode = 200;
+                callback(out);
+
+            } else {
+                log(JSON.stringify(payload.doc));
+                logError("No customer information found on the sales order document (Sell_to_Email is missing or invalid).");
+                out.ncStatusCode = 204;
+                callback(out);
+            }
+
+        } catch (error) {
+            logError("Exception occurred in ExtractCustomerFromSalesOrder: " + error);
+            out.ncStatusCode = 500;
+            out.payload.error = {
+                err: error,
+                stackTrace: error.stackTrace
+            };
+            callback(out);
         }
 
-        if (!channelProfile) {
-          invalid = true;
-          invalidMsg = "channelProfile was not provided"
-        } else if (!channelProfile.channelSettingsValues) {
-          invalid = true;
-          invalidMsg = "channelProfile.channelSettingsValues was not provided"
-        } else if (!channelProfile.channelSettingsValues.protocol) {
-          invalid = true;
-          invalidMsg = "channelProfile.channelSettingsValues.protocol was not provided"
-        } else if (!channelProfile.channelAuthValues) {
-          invalid = true;
-          invalidMsg = "channelProfile.channelAuthValues was not provided"
-        } else if (!channelProfile.salesOrderBusinessReferences) {
-          invalid = true;
-          invalidMsg = "channelProfile.salesOrderBusinessReferences was not provided"
-        } else if (!Array.isArray(channelProfile.salesOrderBusinessReferences)) {
-          invalid = true;
-          invalidMsg = "channelProfile.salesOrderBusinessReferences is not an array"
-        } else if (channelProfile.salesOrderBusinessReferences.length === 0) {
-          invalid = true;
-          invalidMsg = "channelProfile.salesOrderBusinessReferences is empty"
-        }
-
-        // Check Payload
-        if (!invalid) {
-          if (payload) {
-              if (!payload.doc) {
-                  invalidMsg = "Extract Customer From Sales Order - Invalid Request: payload.doc was not provided";
-                  invalid = true;
-              } else if (!payload.doc.BillingCustomer) {
-                  notFound = true;
-                  invalidMsg = "Extract Customer From Sales Order - Customer Not Found: The order has no customer (payload.doc.BillingCustomer)";
-              } else {
-                  data = payload.doc.BillingCustomer;
-              }
-          } else {
-              invalidMsg = "Extract Customer From Sales Order - Invalid Request: payload was not provided";
-              invalid = true;
-          }
-        }
-
-        if (!invalid && !notFound) {
-          // Customer Found
-          out.payload.doc = data;
-          out.ncStatusCode = 200;
-
-          callback(out);
-        } else if (!invalid && notFound){
-          // Customer Not Found
-          log(invalidMsg, ncUtil);
-          out.ncStatusCode = 204;
-
-          callback(out);
-        } else {
-          // Invalid Request (payload or payload.doc was not passed in)
-          log(invalidMsg, ncUtil);
-          out.ncStatusCode = 400;
-          out.payload.error = { err: invalidMsg };
-
-          callback(out);
-        }
-    }
-    catch (err){
-        logError("Exception occurred in ExtractCustomerFromSalesOrder - " + err, ncUtil);
-        out.ncStatusCode = 500;
-        out.payload.error = { err: err.message, stackTrace: err.stackTrace };
+    } else {
+        out.ncStatusCode = 400;
+        out.payload.error = {
+            err: "Invalid request: " + validationMessages.join(",")
+        };
         callback(out);
     }
 
-}
+    function validateArguments() {
 
-function logError(msg, ncUtil) {
-    console.log("[error] " + msg);
-}
+        let validationMessages = [];
 
-function log(msg, ncUtil) {
-    console.log("[info] " + msg);
-}
+        try {
+            // Validate ncUtil object (not currently used)
+
+            // Validate channelProfile object (not currently used)
+
+            // Validate flowContext object (not currently used)
+
+            // Validate payload object
+            if (typeof payload === "object" && payload !== null) {
+
+                if (!payload.doc) {
+                    validationMessages.push("payload.doc is either missing or invalid.");
+                }
+
+            } else {
+                validationMessages.push("The payload object is either missing or invalid.");
+            }
+
+            // Validate callback function
+            if (typeof callback !== "function") {
+                validationMessages.push("The callback function is either missing or invalid.");
+                throw new TypeError(validationMessages[validationMessages.length - 1]);
+            }
+
+        } finally {
+            // Log the validation messages
+            validationMessages.forEach(logError);
+        }
+
+        return validationMessages;
+    };
+
+    function logError(msg) {
+        console.log("[error] " + functionName + ": " + msg);
+    };
+
+    function log(msg) {
+        console.log("[info] " + functionName + ": " + msg);
+    };
+};
+
 module.exports.ExtractCustomerFromSalesOrder = ExtractCustomerFromSalesOrder;
