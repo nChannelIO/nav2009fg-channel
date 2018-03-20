@@ -5,18 +5,15 @@
 		"title": "NAV 2009 Frederick Goldman - PUT Customer Schema",
 		"type": "object",
 		"properties": {
-			"attributes": {
-				"type": "object"
-			},
 			"CustomerNo": {
+			    "title": "CustomerNumber",
+				"description": "The customer's id.",
 				"type": "string"
 			},
 			"E_Mail": {
 				"title": "E_Mail",
 				"description": "The customer's email address.",
-				"type": [
-					"string"
-				]
+				"type": "string"
 			},
 			"Name": {
 				"title": "Name",
@@ -26,9 +23,7 @@
 			"Phone_No": {
 				"title": "Phone_No",
 				"description": "The customer's phone number.",
-				"type": [
-					"string"
-				]
+				"type": "string"
 			},
 			"Address": {
 				"title": "Address",
@@ -38,10 +33,7 @@
 			"Address_2": {
 				"title": "Address_2",
 				"description": "An additional field for the customer's mailing address.",
-				"type": [
-					"string",
-					"null"
-				]
+				"type": "string"
 			},
 			"City": {
 				"title": "City",
@@ -51,9 +43,7 @@
 			"County": {
 				"title": "County",
 				"description": "The customer's province or state name.",
-				"type": [
-					"string"
-				]
+				"type": "string"
 			},
 			"Postal_Code": {
 				"title": "Postal_Code",
@@ -62,6 +52,7 @@
 			}
 		},
 		"required": [
+		    "CustomerNo",
 			"E_Mail",
 			"Name",
 			"Phone_No",
