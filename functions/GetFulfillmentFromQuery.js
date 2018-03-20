@@ -1,8 +1,9 @@
 'use strict';
 
 let _ = require('lodash');
-let dateFormat = require('dateformat');
-let format = 'UTC:mm/dd/yyyy hh:MM:ss TT';
+let moment = require('moment');
+let utcOffset = '-0500';
+let format = 'MM/DD/YYYY hh:mm:ss A';
 let soap = require('soap-ntlm-2');
 
 let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, payload, callback) {
@@ -36,8 +37,8 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
 
             let args = {
                 order_No: flowContext.orderNumberFilter + "*",
-                shipped_Start_DateTime: dateFormat(payload.doc.modifiedDateRange.startDateGMT, format),
-                shipped_End_DateTime: dateFormat(payload.doc.modifiedDateRange.endDateGMT, format),
+                shipped_Start_DateTime: moment(payload.doc.modifiedDateRange.startDateGMT).utcOffset(utcOffset).format(format),
+                shipped_End_DateTime: moment(payload.doc.modifiedDateRange.endDateGMT).utcOffset(utcOffset).format(format),
                 ec_Transactions: "",
                 export_Status: ""
             };
