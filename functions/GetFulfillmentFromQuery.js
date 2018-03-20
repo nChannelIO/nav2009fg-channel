@@ -2,7 +2,7 @@
 
 let _ = require('lodash');
 let moment = require('moment');
-let utcOffset = '-0500';
+let utcOffset = '-0400'; //EDT
 let format = 'MM/DD/YYYY hh:mm:ss A';
 let soap = require('soap-ntlm-2');
 
