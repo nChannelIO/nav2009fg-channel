@@ -100,10 +100,7 @@
 					"Quantity",
 					"Price",
                     "Line_Discount",
-                    "Tax_Amount",
-                    "Personalizations_Font",
-                    "Personalizations_Symbol",
-                    "Personalizations_Message"
+                    "Tax_Amount"
 				],
 				"additionalProperties": false
 			}
