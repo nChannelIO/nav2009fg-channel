@@ -1,137 +1,187 @@
-let InsertCustomer = function (ncUtil,
-                                 channelProfile,
-                                 flowContext,
-                                 payload,
-                                 callback) {
+'use strict';
 
-  log("Building response object...", ncUtil);
-  let out = {
-    ncStatusCode: null,
-    response: {},
-    payload: {}
-  };
+let InsertCustomer = function (ncUtil, channelProfile, flowContext, payload, callback) {
 
-  let invalid = false;
-  let invalidMsg = "";
+    let functionName = "InsertCustomer";
+    log("Begin Insert Customer...");
 
-  //If ncUtil does not contain a request object, the request can't be sent
-  if (!ncUtil) {
-    invalid = true;
-    invalidMsg = "ncUtil was not provided"
-  }
-
-  //If channelProfile does not contain channelSettingsValues, channelAuthValues or customerBusinessReferences, the request can't be sent
-  if (!channelProfile) {
-    invalid = true;
-    invalidMsg = "channelProfile was not provided"
-  } else if (!channelProfile.channelSettingsValues) {
-    invalid = true;
-    invalidMsg = "channelProfile.channelSettingsValues was not provided"
-  } else if (!channelProfile.channelSettingsValues.protocol) {
-    invalid = true;
-    invalidMsg = "channelProfile.channelSettingsValues.protocol was not provided"
-  } else if (!channelProfile.channelAuthValues) {
-    invalid = true;
-    invalidMsg = "channelProfile.channelAuthValues was not provided"
-  } else if (!channelProfile.customerBusinessReferences) {
-    invalid = true;
-    invalidMsg = "channelProfile.customerBusinessReferences was not provided"
-  } else if (!Array.isArray(channelProfile.customerBusinessReferences)) {
-    invalid = true;
-    invalidMsg = "channelProfile.customerBusinessReferences is not an array"
-  } else if (channelProfile.customerBusinessReferences.length === 0) {
-    invalid = true;
-    invalidMsg = "channelProfile.customerBusinessReferences is empty"
-  }
-
-  //If a sales order document was not passed in, the request is invalid
-  if (!payload) {
-    invalid = true;
-    invalidMsg = "payload was not provided"
-  } else if (!payload.doc) {
-    invalid = true;
-    invalidMsg = "payload.doc was not provided";
-  }
-
-  //If callback is not a function
-  if (!callback) {
-    throw new Error("A callback function was not provided");
-  } else if (typeof callback !== 'function') {
-    throw new TypeError("callback is not a function")
-  }
-
-  if (!invalid) {
-    // Using request for example - A different npm module may be needed depending on the API communication is being made to
-    // The `soap` module can be used in place of `request` but the logic and data being sent will be different
-    let request = require('request');
-
-    let url = "https://localhost/";
-
-    // Add any headers for the request
-    let headers = {
-
+    let out = {
+        ncStatusCode: null,
+        payload: []
     };
 
-    // Log URL
-    log("Using URL [" + url + "]", ncUtil);
+    log("Validate arguments...");
+    let validationMessages = validateArguments();
 
-    // Set options
-    let options = {
-      url: url,
-      method: "POST",
-      headers: headers,
-      body: payload.doc,
-      json: true
-    };
+    if (validationMessages.length === 0) {
 
-    try {
-      // Pass in our URL and headers
-      request(options, function (error, response, body) {
-        if (!error) {
-          // If no errors, process results here
-          if (response.statusCode === 201) {
-            out.ncStatusCode = 201;
-          } else if (response.statusCode == 429) {
-            out.ncStatusCode = 429;
-            out.payload.error = body;
-          } else if (response.statusCode == 500) {
+        try {
+
+            const soap = require('soap-ntlm-2');
+
+            let url = channelProfile.channelSettingsValues.wsdl_uri_Customer;
+
+            let options = {
+                wsdl_options: {
+                    ntlm: true,
+                    strictSSL: false,
+                    rejectUnauthorized: false,
+                    username: channelProfile.channelAuthValues.username,
+                    password: channelProfile.channelAuthValues.password,
+                    workstation: channelProfile.channelAuthValues.workstation,
+                    domain: channelProfile.channelAuthValues.domain
+                }
+            };
+
+            delete payload.doc.CustomerNo;
+            payload.doc.attributes = {
+                xmlns: "urn:microsoft-dynamics-nav/xmlports/x50031"
+            };
+
+            let args = {
+                ec_Customer: {
+                    Customer: payload.doc
+                },
+                customerNo: ""
+            };
+
+            soap.createClient(url, options, function (err, client) {
+                if (err) {
+                    logError(err);
+                    out.ncStatusCode = 500;
+                    out.payload.error = {
+                        err: err
+                    };
+                    callback(out);
+
+                } else {
+                    client.setSecurity(new soap.NtlmSecurity(options.wsdl_options));
+                    client.Create_Customer(args, function (err, result) {
+
+                        if (err) {
+                            logError(err);
+                            out.ncStatusCode = 500;
+                            out.payload.error = {
+                                err: err
+                            };
+                            callback(out);
+
+                        } else {
+
+                            if (result.customerNo) {
+                                out.ncStatusCode = 201;
+                                out.payload.customerRemoteID = result.customerNo;
+                                out.payload.customerBusinessReference = payload.doc.E_Mail;
+                            } else {
+                                logError(JSON.stringify(result));
+                                out.ncStatusCode = 400;
+                                out.payload.error = {
+                                    err: result
+                                };
+                            }
+                            callback(out);
+                        }
+                    })
+                }
+            })
+
+        } catch (error) {
+            logError("Exception occurred in InsertCustomer: " + error);
             out.ncStatusCode = 500;
-            out.payload.error = body;
-          } else {
-            out.ncStatusCode = 400;
-            out.payload.error = body;
-          }
-          callback(out);
-        } else {
-          // If an error occurs, log the error here
-          logError("Do InsertCustomer Callback error - " + error, ncUtil);
-          out.ncStatusCode = 500;
-          out.payload.error = {err: error};
-          callback(out);
+            out.payload.error = {
+                err: error,
+                stack: error.stackTrace
+            };
+            callback(out);
         }
-      });
-    } catch (err) {
-      // Exception Handling
-      logError("Exception occurred in InsertSalesOrder - " + err, ncUtil);
-      out.ncStatusCode = 500;
-      out.payload.error = {err: err, stack: err.stackTrace};
-      callback(out);
+
+    } else {
+        out.ncStatusCode = 400;
+        out.payload.error = {
+            err: "Invalid request: " + validationMessages.join(",")
+        };
+        callback(out);
     }
-  } else {
-    // Invalid Request
-    log("Callback with an invalid request - " + invalidMsg, ncUtil);
-    out.ncStatusCode = 400;
-    out.payload.error = invalidMsg;
-    callback(out);
-  }
+
+    function validateArguments() {
+
+        let validationMessages = [];
+
+        try {
+            // Validate ncUtil object (not currently used)
+
+            // Validate channelProfile object
+            if (typeof channelProfile === "object" && channelProfile !== null) {
+                // Validate channelProfile properties
+
+
+                // Validate channelSettingsValues object
+                if (typeof channelProfile.channelSettingsValues === "object" && channelProfile.channelSettingsValues !== null) {
+
+                    if (typeof channelProfile.channelSettingsValues.wsdl_uri_Customer !== "string" || channelProfile.channelSettingsValues.wsdl_uri_Customer.trim().length === 0) {
+                        validationMessages.push("The channelProfile.channelSettingsValues.wsdl_uri_Customer string is either missing or invalid.");
+                    }
+
+                } else {
+                    validationMessages.push("The channelProfile.channelSettingsValues object is either missing or invalid.");
+                }
+
+                // Validate channelAuthValues object
+                if (typeof channelProfile.channelAuthValues === "object" && channelProfile.channelAuthValues !== null) {
+
+                    if (typeof channelProfile.channelAuthValues.username !== "string" || channelProfile.channelAuthValues.username.trim().length === 0) {
+                        validationMessages.push("The channelProfile.channelAuthValues.username string is either missing or invalid.");
+                    }
+
+                    if (typeof channelProfile.channelAuthValues.password !== "string" || channelProfile.channelAuthValues.password.trim().length === 0) {
+                        validationMessages.push("The channelProfile.channelAuthValues.password string is either missing or invalid.");
+                    }
+
+                    if (typeof channelProfile.channelAuthValues.domain !== "string" || channelProfile.channelAuthValues.domain.trim().length === 0) {
+                        validationMessages.push("The channelProfile.channelAuthValues.domain string is either missing or invalid.");
+                    }
+
+                } else {
+                    validationMessages.push("The channelProfile.channelAuthValues object is either missing or invalid.");
+                }
+
+            } else {
+                validationMessages.push("The channelProfile object is either missing or invalid.");
+            }
+
+            // Validate flowContext object (not currently used)
+
+            // Validate payload object
+            if (typeof payload === "object" && payload !== null) {
+
+                if (!payload.doc) {
+                    validationMessages.push("The payload.doc is either missing or invalid.");
+                }
+
+            } else {
+                validationMessages.push("The payload object is either missing or invalid.");
+            }
+
+            // Validate callback function
+            if (typeof callback !== "function") {
+                validationMessages.push("The callback function is either missing or invalid.");
+                throw new TypeError(validationMessages[validationMessages.length - 1]);
+            }
+        } finally {
+            // Log the validation messages
+            validationMessages.forEach(logError);
+        }
+
+        return validationMessages;
+    };
+
+    function logError(msg) {
+        console.log("[error] " + functionName + ": " + msg);
+    };
+
+    function log(msg) {
+        console.log("[info] " + functionName + ": " + msg);
+    };
 };
-
-function logError(msg, ncUtil) {
-  console.log("[error] " + msg);
-}
-
-function log(msg, ncUtil) {
-  console.log("[info] " + msg);
-}
 
 module.exports.InsertCustomer = InsertCustomer;
