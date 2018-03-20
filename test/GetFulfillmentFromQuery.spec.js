@@ -43,8 +43,8 @@ describe('GetFulfillmentFromQuery', () => {
       let examplePayload = {
         doc: {
           modifiedDateRange: {
-            startDateGMT: "2018-03-12T13:54:00.000Z",
-            endDateGMT: "2018-03-12T13:56:00.000Z",
+            startDateGMT: "2018-03-12T18:54:00.000Z",
+            endDateGMT: "2018-03-12T18:56:00.000Z",
           }
         }
       };
@@ -86,8 +86,8 @@ describe('GetFulfillmentFromQuery', () => {
 			let examplePayload = {			
 				doc: {
 					modifiedDateRange: {
-						startDateGMT: "2018-03-12T13:54:00.000Z",
-            endDateGMT: "2018-03-13T14:36:00.000Z",
+						startDateGMT: "2018-03-12T18:54:00.000Z",
+            endDateGMT: "2018-03-13T19:36:00.000Z",
 					}
 				}
 			};
