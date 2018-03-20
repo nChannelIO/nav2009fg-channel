@@ -1,8 +1,9 @@
 'use strict';
 
 let _ = require('lodash');
-let dateFormat = require('dateformat');
-let format = 'UTC:m/dd/yyyy h:MM:ss TT';
+let moment = require('moment');
+let utcOffset = '-0500';
+let format = 'MM/DD/YYYY hh:mm:ss A';
 let soap = require('soap-ntlm-2');
 
 let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, payload, callback) {
@@ -36,8 +37,8 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
 
             let args = {
                 order_No: flowContext.orderNumberFilter + "*",
-                shipped_Start_DateTime: dateFormat(payload.doc.modifiedDateRange.startDateGMT, format),
-                shipped_End_DateTime: dateFormat(payload.doc.modifiedDateRange.endDateGMT, format),
+                shipped_Start_DateTime: moment(payload.doc.modifiedDateRange.startDateGMT).utcOffset(utcOffset).format(format),
+                shipped_End_DateTime: moment(payload.doc.modifiedDateRange.endDateGMT).utcOffset(utcOffset).format(format),
                 ec_Transactions: "",
                 export_Status: ""
             };
@@ -65,7 +66,7 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
                                     // error - should always have at least one blank node or 1 or more good nodes
                                     out.ncStatusCode = 400;
                                     out.payload.error = "unexpected xml returned";
-                                } else if (result.ec_Transactions.OrderTranscation.length === 1 && !result.ec_Transactions.OrderTranscation.Customer_No) {
+                                } else if (result.ec_Transactions.OrderTranscation.length === 1 && !result.ec_Transactions.OrderTranscation[0].Customer_No) {
                                     // at least one node returned - see if it is empty node
                                     out.ncStatusCode = 204;
                                     out.payload = [];
