@@ -108,12 +108,12 @@
         "title": "NAV 2009 - Frederick Goldman Channel Settings",
         "properties": {
           "wsdl_uri_Customer": {
-            "title": "WSDL URI - Customer",
+            "title": "WSDL URI - Customer *",
             "type": "string",
             "placeholder":"<URI of WSDL>?wsdl"
           },
           "wsdl_uri_Order": {
-            "title": "WSDL URI - Order",
+            "title": "WSDL URI - Order *",
             "type": "string",
             "placeholder":"<URI of WSDL>?wsdl"
           }
