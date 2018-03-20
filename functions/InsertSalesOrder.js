@@ -36,6 +36,10 @@ let InsertSalesOrder = function (ncUtil, channelProfile, flowContext, payload, c
             log("Assigning customerRemoteID '" + payload.customerRemoteID + "' to Sell_to_No.");
             payload.doc.Sell_to_No = payload.customerRemoteID;
 
+            payload.doc.attributes = {
+                xmlns: "urn:microsoft-dynamics-nav/xmlports/x50032"
+            };
+            
             let args = {
                 eC_Order: {
                     SalesOrder: payload.doc
