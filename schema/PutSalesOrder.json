@@ -6,51 +6,51 @@
 		"type": "object",
 		"properties": {
 			"Order_No": {
-				"type": "string"
-			},
-			"Sell_to_No": {
-				"type": "string"
-			},
-			"Sell_to_Customer_Name": {
-				"type": "string"
-			},
-			"Sell_to_Email": {
-				"type": "string"
-			},
-			"Ship_to_Name": {
-				"type": "string"
-			},
-			"Ship_to_Address": {
-				"type": "string"
-			},
-			"Ship_to_City": {
-				"type": "string"
-			},
-			"Ship_to_Post_County": {
-				"type": "string"
-			},
-			"Ship_to_Post_Code": {
-				"type": "string"
-			},
-			"Shipment_Method_Code": {
-				"type": "string"
-			},
-			"orderStatus": {
-				"type": "string",
-				"enum": [
-					"Open",
-					"Released",
-					"Pending_Approval",
-					"Pending_Prepayment"
-				]
-			},
-			"SalesLine": {
-				"type": "array",
-				"minItems": 1,
-				"items": {
-					"$ref": "#/definitions/SalesLineObject"
-				}
-			}
+                "type": "string"
+            },
+            "Sell_to_No": {
+                "type": "string"
+            },
+            "Sell_to_Customer_Name": {
+                "type": "string"
+            },
+            "Sell_to_Email": {
+                "type": "string"
+            },
+            "Ship_to_Name": {
+                "type": "string"
+            },
+            "Ship_to_Address": {
+                "type": "string"
+            },
+            "Ship_to_City": {
+                "type": "string"
+            },
+            "Ship_to_Post_County": {
+                "type": "string"
+            },
+            "Ship_to_Post_Code": {
+                "type": "string"
+            },
+            "Payment_Method_Code": {
+                "type": "string"
+            },
+            "CC_No": {
+                "type": "string"
+            },
+            "Shipment_Method_Code": {
+                "type": "string"
+            },
+            "Shipping_Charge_Amount": {
+                "type": "number"
+            },
+            "SalesLine": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                    "$ref": "#/definitions/SalesLineObject"
+                }
+            }
 		},
 		"required": [
 			"Order_No",
@@ -63,12 +63,10 @@
 			"Ship_to_Post_County",
 			"Ship_to_Post_Code",
 			"Shipment_Method_Code",
+            "Shipping_Charge_Amount",
 			"SalesLine"
 		],
 		"definitions": {
-			"SalesOrderObject": {
-				"type": "object"
-			},
 			"SalesLineObject": {
 				"type": "object",
 				"properties": {
@@ -81,6 +79,12 @@
 					"Price": {
 						"type": "number"
 					},
+                    "Line_Discount": {
+	                    "type": "number"
+	                },
+	                "Tax_Amount": {
+	                    "type": "number"
+	                },
 					"Personalizations_Font": {
 						"type": "string"
 					},
@@ -94,76 +98,14 @@
 				"required": [
 					"ItemNo_Size",
 					"Quantity",
-					"Price"
-				]
-			},
-			"customer": {
-				"title": "address",
-				"type": "object",
-				"properties": {
-					"E_Mail": {
-						"title": "E_Mail",
-						"description": "The customer's email address.",
-						"type": [
-							"string"
-						]
-					},
-					"Name": {
-						"title": "Name",
-						"description": "The customer's name.",
-						"type": "string"
-					},
-					"Phone_No": {
-						"title": "Phone_No",
-						"description": "The customer's phone number.",
-						"type": [
-							"string"
-						]
-					},
-					"Address": {
-						"title": "Address",
-						"description": "The customer's mailing address # 1.",
-						"type": "string"
-					},
-					"Address_2": {
-						"title": "Address_2",
-						"description": "An additional field for the customer's mailing address.",
-						"type": [
-							"string",
-							"null"
-						]
-					},
-					"city": {
-						"title": "city",
-						"description": " The customer's city.",
-						"type": "string"
-					},
-					"County": {
-						"title": "County",
-						"description": "The customer's province or state name.",
-						"type": [
-							"string"
-						]
-					},
-					"Postal_Code": {
-						"title": "Postal_Code",
-						"description": "The customer's zip or postal code.",
-						"type": "string"
-					}
-				},
-				"required": [
-					"E_Mail",
-					"Name",
-					"Phone_No",
-					"Address",
-					"Address_2",
-					"City",
-					"County",
-					"Postal_Code"
+					"Price",
+                    "Line_Discount",
+                    "Tax_Amount"
 				],
 				"additionalProperties": false
 			}
-		}
+		},
+		"additionalProperties": false
 	},
 	"tags": [
 		"Put",
