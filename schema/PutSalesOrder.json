@@ -62,8 +62,6 @@
 			"Ship_to_City",
 			"Ship_to_Post_County",
 			"Ship_to_Post_Code",
-            "Payment_Method_Code",
-            "CC_No",
 			"Shipment_Method_Code",
             "Shipping_Charge_Amount",
 			"SalesLine"
