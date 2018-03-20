@@ -12,7 +12,7 @@ let channelProfile = {
   fulfillmentBusinessReferences: ['Order_No']
 };
 let flowContext = {
-  orderNumberFilter: 'E'
+  orderNumberFilter: 'EC'
 };
 
 let ncUtil = {
@@ -43,8 +43,8 @@ describe('GetFulfillmentFromQuery', () => {
       let examplePayload = {
         doc: {
           modifiedDateRange: {
-            startDateGMT: "2018-03-12T13:54:00.000Z",
-            endDateGMT: "2018-03-12T13:56:00.000Z",
+            startDateGMT: "2018-03-12T18:54:00.000Z",
+            endDateGMT: "2018-03-12T18:56:00.000Z",
           }
         }
       };
@@ -56,9 +56,9 @@ describe('GetFulfillmentFromQuery', () => {
         ItemNo_Size: "01-LD040-G.00_09.00",
         Website_Code: "01",
         Ordered_Quantity: "1",
-        Shipped_Quantity: "0",
+        Shipped_Quantity: "1",
         Shipping_Agent_Code: "UPS",
-        Tracking_No: "",
+        Tracking_No: "1Z055E040226000456",
         Shipment_No: "SS-3362314",
         Shipped_DateTime: "03/12/18 01:55 PM",
         Status: "Released"
@@ -86,8 +86,8 @@ describe('GetFulfillmentFromQuery', () => {
 			let examplePayload = {			
 				doc: {
 					modifiedDateRange: {
-						startDateGMT: "2018-03-01T14:41:00.000Z",
-            endDateGMT: "2018-03-16T14:41:00.000Z",
+						startDateGMT: "2018-03-12T18:54:00.000Z",
+            endDateGMT: "2018-03-13T19:36:00.000Z",
 					}
 				}
 			};
@@ -100,9 +100,9 @@ describe('GetFulfillmentFromQuery', () => {
           ItemNo_Size: "01-LD040-G.00_09.00",
           Website_Code: "01",
           Ordered_Quantity: "1",
-          Shipped_Quantity: "0",
+          Shipped_Quantity: "1",
           Shipping_Agent_Code: "UPS",
-          Tracking_No: "",
+          Tracking_No: "1Z055E040226000456",
           Shipment_No: "SS-3362314",
           Shipped_DateTime: "03/12/18 01:55 PM",
           Status: "Released"
@@ -113,9 +113,9 @@ describe('GetFulfillmentFromQuery', () => {
           ItemNo_Size: "01-LD040-G.00_10.00",
           Website_Code: "01",
           Ordered_Quantity: "1",
-          Shipped_Quantity: "0",
+          Shipped_Quantity: "1",
           Shipping_Agent_Code: "UPS",
-          Tracking_No: "",
+          Tracking_No: "1Z055E040226000847",
           Shipment_No: "SS-3362315",
           Shipped_DateTime: "03/13/18 02:35 PM",
           Status: "Released"
@@ -123,7 +123,6 @@ describe('GetFulfillmentFromQuery', () => {
       ];
 
       fulfillment.GetFulfillmentFromQuery(ncUtil, channelProfile, flowContext, examplePayload, (response) => {
-        console.log(response);
 				expect(response.ncStatusCode).to.be.equal(200);
 				expect(response.payload).to.be.an('Array');
 				expect(response.payload).to.have.length(2);
@@ -152,12 +151,7 @@ describe('GetFulfillmentFromQuery', () => {
       };
 
       let channelProfile = {
-        channelAuthValues: {
-          account: 'test',
-          username: "fgiecommercews",
-          password: "Jewel!2018",
-          domain: "fgoldman"
-        },
+        channelAuthValues: require('./channelAuthValues.json'),
         channelSettingsValues: {
           wsdl_uri_Order: ""
         },
