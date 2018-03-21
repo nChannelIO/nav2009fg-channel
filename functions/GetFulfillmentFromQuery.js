@@ -47,9 +47,22 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
 
             soap.createClient(url, options, function (err, client) {
                 if (err) {
-                    logError("Error creating client - " + err);
-                    out.ncStatusCode = 500;
-                    out.payload.error = {err: err};
+                    let errStr = String(err);
+
+                    if (errStr.indexOf("Code: 401") !== -1) {
+                        logError("401 Unauthorized (Invalid Credentials) " + errStr);
+                        out.ncStatusCode = 400;
+                        out.response.endpointStatusCode = 401;
+                        out.response.endpointStatusMessage = "Unauthorized";
+                    } else {
+                        logError("Error creating client - " + errStr);
+                        out.ncStatusCode = 500;
+                    }
+
+                    out.payload.error = {
+                        err: errStr
+                    };
+
                     callback(out);
                 } else {
                     client.setSecurity(new soap.NtlmSecurity(options.wsdl_options));
