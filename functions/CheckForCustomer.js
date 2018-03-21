@@ -7,6 +7,7 @@ let CheckForCustomer = function (ncUtil, channelProfile, flowContext, payload, c
 
     let out = {
         ncStatusCode: null,
+        response: {},
         payload: {}
     };
 
