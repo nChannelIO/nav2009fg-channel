@@ -8,7 +8,7 @@ let InsertCustomer = function (ncUtil, channelProfile, flowContext, payload, cal
     let out = {
         ncStatusCode: null,
         response: {},
-        payload: []
+        payload: {}
     };
 
     log("Validate arguments...");
