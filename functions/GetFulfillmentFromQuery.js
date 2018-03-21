@@ -12,6 +12,7 @@ let GetFulfillmentFromQuery = function (ncUtil, channelProfile, flowContext, pay
 
     let out = {
         ncStatusCode: null,
+        response: {},
         payload: {}
     };
 
