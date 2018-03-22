@@ -75,7 +75,12 @@ let InsertSalesOrder = function (ncUtil, channelProfile, flowContext, payload, c
                                 out.payload.salesOrderRemoteID = payload.doc.Order_No;
                                 out.payload.salesOrderBusinessReference = payload.doc.Order_No;
                             } else {
-                                logError(JSON.stringify(result));
+                                if (result.return_value === "The value of COPYSTR parameter 3 is outside of the permitted range. The current value is: -1. The permitted range is: from 0 to 2,147,483,647."){
+                                    logError("(Invalid SKU) " + JSON.stringify(result));
+                                } else {
+                                    logError(JSON.stringify(result));
+                                }
+
                                 out.ncStatusCode = 400;
                                 out.payload.error = {
                                     err: result
