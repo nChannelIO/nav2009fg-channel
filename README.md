@@ -32,7 +32,7 @@ Each test object in the array must contain the following:
 When `unitTestingPackage` is `soap`:
 
  - `wsdlUri` - `wsdl` URI used with the endpoint system.
- - `security` - (Optional) Security model used within the soap client (i.e. `BasicAuthSecurity`)
+ - `security` - (Optional) Security model used within the soap client (i.e. `BasicAuthSecurity`).
  - `service` - (Optional) `wsdl` service name used for the unit test.
  - `servicePort` -  (Optional) `wsdl` port name used for the unit test.
 
