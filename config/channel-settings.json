@@ -192,13 +192,19 @@
         ]
       },
       "configView": [
-        "username",
+        {
+            "key": "username",
+            "title": "Username"
+        },
         {
             "key": "password",
             "title": "Password",
             "type": "password"
         },
-        "domain"
+        {
+            "key": "domain",
+            "title": "Domain"
+        }
       ],
       "configValues": {}
     }
