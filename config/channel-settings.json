@@ -47,7 +47,7 @@
       },
       "documentDef" : {
         "schema": {},
-        "referenceLocation": {"salesOrderBusinessReferences": [""]}
+        "referenceLocation": {"salesOrderBusinessReferences": ["Order_No"]}
       }
     },
     {
@@ -89,7 +89,7 @@
       },
       "documentDef": {
         "schema": {},
-        "referenceLocation": {"customerBusinessReferences": ["", ""]}
+        "referenceLocation": {"customerBusinessReferences": ["E_Mail"]}
       }
     },
     {
