@@ -85,8 +85,12 @@ let InsertCustomer = function (ncUtil, channelProfile, flowContext, payload, cal
                                 out.payload.customerRemoteID = result.customerNo;
                                 out.payload.customerBusinessReference = payload.doc.E_Mail;
                             } else {
+                                if (result.return_value.includes("locked by another user")) {
+                                    out.ncStatusCode = 500;
+                                } else {
+                                    out.ncStatusCode = 400;
+                                }
                                 logError(JSON.stringify(result));
-                                out.ncStatusCode = 400;
                                 out.payload.error = {
                                     err: result
                                 };
