@@ -103,8 +103,7 @@
 					"ItemNo_Size",
 					"Quantity",
 					"Price",
-                    "Line_Discount",
-                    "Tax_Amount"
+                    "Line_Discount"
 				],
 				"additionalProperties": false
 			}
