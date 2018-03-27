@@ -44,6 +44,9 @@
             "Shipping_Charge_Amount": {
                 "type": "number"
             },
+			"Tax_Percent": {
+				"type": "number"
+			},
             "SalesLine": {
                 "type": "array",
                 "minItems": 1,
