@@ -97,6 +97,9 @@
 					},
 					"Personalizations_Message": {
 						"type": "string"
+					},
+					"Personalizations_After_Symbol": {
+						"type": "string"
 					}
 				},
 				"required": [
